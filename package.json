@@ -1,0 +1,29 @@
+{
+  "name": "phaser-webpack-loader",
+  "version": "0.1.0",
+  "author": "GoldFire Studios, Inc. (http://goldfirestudios.com)",
+  "description": "Asset loader for Phaser + Webpack.",
+  "author": "James Simpson <james@goldfirestudios.com> (http://goldfirestudios.com)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/goldfire/phaser-webpack-loader.git"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "release": "VERSION=`printf 'v' && node -e 'console.log(require(\"./package.json\").version)'` && git tag $VERSION && git push && git push origin $VERSION && npm publish"
+  },
+  "dependencies": {
+    "webfontloader": "^1.6.27"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "keywords": [
+    "phaser",
+    "assets",
+    "loader",
+    "webpack",
+    "asset loader",
+    "manifest"
+  ]
+}
