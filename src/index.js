@@ -59,7 +59,7 @@ export default class WebpackLoader extends Phaser.Plugin {
         // Loop through each asset of this type.
         this.assets[key].forEach((asset) => {
           const assetData = asset.split('.');
-          this.loaders[key](assetData[0], assetData[1]);
+          this.loaders[key].call(this, assetData[0], assetData[1]);
         });
       });
 
