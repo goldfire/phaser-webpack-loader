@@ -1,6 +1,6 @@
 {
   "name": "phaser-webpack-loader",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "GoldFire Studios, Inc. (http://goldfirestudios.com)",
   "description": "Asset loader for Phaser + Webpack.",
   "author": "James Simpson <james@goldfirestudios.com> (http://goldfirestudios.com)",

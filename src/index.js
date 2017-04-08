@@ -11,9 +11,6 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @param  {String} postfix  (optional) Postfix to append to assets.
    */
   init(manifest, postfix = '') {
-    // Pull the base directory out of the manifest.
-    this.baseDir = manifest.baseDir || 'assets/';
-
     // Pull the font values out of the manifest.
     this.fonts = manifest.fonts || {};
 
@@ -91,7 +88,7 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @param  {String} ext  File extension.
    */
   _loadImage(name, ext) {
-    const file = require(`${this.baseDir}images/${name}${this.postfix}.${ext}`);
+    const file = require(`assets/images/${name}${this.postfix}.${ext}`);
     this.game.load.image(name, file);
   }
 
@@ -101,8 +98,8 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @param  {String} ext  File extension.
    */
   _loadSprite(name, ext) {
-    const file = require(`${this.baseDir}sprites/${name}${this.postfix}.${ext}`);
-    const data = require(`${this.baseDir}sprites/${name}${this.postfix}.json`);
+    const file = require(`assets/sprites/${name}${this.postfix}.${ext}`);
+    const data = require(`assets/sprites/${name}${this.postfix}.json`);
     this.game.load.atlasJSONHash(name, file, null, data);
   }
 
@@ -112,7 +109,7 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @param  {String} ext  File extension.
    */
   _loadAudio(name, ext) {
-    const file = require(`${this.baseDir}audio/${name}.${ext}`);
+    const file = require(`assets/audio/${name}.${ext}`);
     this.game.load.audio(name, file);
   }
 
@@ -122,8 +119,8 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @param  {String} ext  File extension.
    */
   _loadBitmapFont(name, ext) {
-    const file = require(`${this.baseDir}fonts/${name}${this.postfix}.${ext}`);
-    const data = require(`${this.baseDir}fonts/${name}${this.postfix}.xml`);
+    const file = require(`assets/fonts/${name}${this.postfix}.${ext}`);
+    const data = require(`assets/fonts/${name}${this.postfix}.xml`);
     this.game.load.bitmapFont(name, file, data);
   }
 }

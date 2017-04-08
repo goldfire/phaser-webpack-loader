@@ -28,7 +28,6 @@ Then create your manifest file and add the plugin as outlined below.
 
 ```javascript
 const AssetManifest = {
-  baseDir: 'src/assets/',
   images: [
     'image001.png',
     'image002.jpg',
@@ -59,6 +58,16 @@ const AssetManifest = {
 };
 
 export default AssetManifest;
+```
+
+Then, specify the base directory in your Webpack config:
+
+```
+resolve: {
+    alias: {
+      assets: path.join(__dirname, '../src/assets'),
+    },
+  },
 ```
 
 ## Running Plugin (Preload.js)
