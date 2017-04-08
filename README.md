@@ -109,6 +109,23 @@ assets/
 └── fonts/
 ```
 
+## ES6 Building
+
+This plugin is not pre-compiled to ES5, so you'll want to make sure your Webpack config rules are setup to not exclude it:
+
+```javascript
+module: {
+  rules: [
+    {
+      test: /\.js$/,
+      loader: '...',
+      exclude: /node_modules\/(?!phaser-webpack-loader)/,
+    },
+  ],
+  ...
+},
+```
+
 ### License
 
 Copyright (c) 2017 [James Simpson](https://twitter.com/GoldFireStudios) and [GoldFire Studios, Inc.](http://goldfirestudios.com)
