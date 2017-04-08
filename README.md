@@ -34,7 +34,7 @@ const AssetManifest = {
     'image002.jpg',
     '...',
   ],
-  spritesheets: [
+  sprites: [
     'sprite001.png',
     'sprite002.png',
     '...',
