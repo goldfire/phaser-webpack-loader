@@ -60,16 +60,6 @@ const AssetManifest = {
 export default AssetManifest;
 ```
 
-Then, specify the base directory in your Webpack config:
-
-```
-resolve: {
-    alias: {
-      assets: path.join(__dirname, '../src/assets'),
-    },
-  },
-```
-
 ## Running Plugin (Preload.js)
 
 In your preload state, add the plugin. It uses promises, which makes it flexible to move to the next step when ready.
@@ -99,7 +89,17 @@ All sprite/atlas files are loaded as JSON hashes (which can be output using [Tex
 
 ## Directory Structure
 
-You can specify whatever base directory you would like in the manifest file, but then each asset type should go as follows:
+Specify the base directory in your Webpack config:
+
+```
+resolve: {
+  alias: {
+    assets: path.join(__dirname, '../src/assets'),
+  },
+},
+```
+
+Then, place your assets in the following sub-directories:
 
 ```
 assets/
