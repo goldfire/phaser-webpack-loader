@@ -13,6 +13,7 @@ View sample usage in this [Phaser ES6 Boilerplate](https://github.com/goldfire/p
 * Load images, spritesheets, atlases, audio, bitmap fonts and web fonts.
 * Integrated with Webpack for automatic cache-busting.
 * Supports all filetypes.
+* Supports asset postfix for retina support ('@2x', '@3x', etc).
 
 ## Install
 
@@ -77,6 +78,16 @@ export default class Preload extends Phaser.State {
       });
   }
 }
+```
+
+If you want to load high DPI assets, you can pass an optional postfix string:
+
+```javascript
+this.game.plugins.add(WebpackLoader, AssetManifest, '@2x')
+  .load()
+  .then(() => {
+    this.game.state.start('Main');
+  });
 ```
 
 ## Loading Fonts
