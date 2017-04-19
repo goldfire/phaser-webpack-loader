@@ -42,7 +42,7 @@ export default class WebpackLoader extends Phaser.Plugin {
     return Promise.all([
       this._loadAssets(),
       this._loadFonts(),
-    ]);
+    ]).then(this._addSprites.bind(this));
   }
 
   /**
@@ -83,12 +83,32 @@ export default class WebpackLoader extends Phaser.Plugin {
   }
 
   /**
+   * Create the texture atlases once the image data has loaded.
+   * This is required in order to load compressed textures as an atlas.
+   */
+  _addSprites() {
+    this.assets.sprites.forEach((asset) => {
+      // Get the image/data for the sprite atlas.
+      const dir = 'sprites/';
+      const name = asset.split('.')[0];
+      const image = this.game.cache.getItem(name, Phaser.Cache.IMAGE);
+      const compression = image.data.compressionAlgorithm;
+      const format = compression ? `.${compression.toLowerCase()}` : '';
+      const data = require(`assets/${dir}${name}${this.postfix}${format}.json`);
+
+      // Add the sprite atlas to the cache.
+      this.game.cache.addTextureAtlas(name, null, image.data, data, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
+    });
+  }
+
+  /**
    * Load an image.
    * @param  {String} name Name of the file.
    * @param  {String} ext  File extension.
    */
   _loadImage(name, ext) {
-    const file = require(`assets/images/${name}${this.postfix}.${ext}`);
+    const dir = 'images/';
+    const file = require(`assets/${dir}${name}${this.postfix}.${ext}`);
     this.game.load.image(name, file);
   }
 
@@ -98,9 +118,29 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @param  {String} ext  File extension.
    */
   _loadSprite(name, ext) {
-    const file = require(`assets/sprites/${name}${this.postfix}.${ext}`);
-    const data = require(`assets/sprites/${name}${this.postfix}.json`);
-    this.game.load.atlasJSONHash(name, file, null, data);
+    const dir = 'sprites/';
+
+    // Determine which formats are available.
+    const formats = {};
+
+    try {
+      formats.truecolor = require(`assets/${dir}${name}${this.postfix}.${ext}`);
+    } catch (e) {}
+
+    try {
+      formats.pvrtc = require(`assets/${dir}${name}${this.postfix}.pvrtc.pvr`);
+    } catch (e) {}
+
+    try {
+      formats.s3tc = require(`assets/${dir}${name}${this.postfix}.s3tc.pvr`);
+    } catch (e) {}
+
+    try {
+      formats.etc1 = require(`assets/${dir}${name}${this.postfix}.etc1.pkm`);
+    } catch (e) {}
+
+    // Load the format that works on this platform.
+    this.game.load.image(name, formats);
   }
 
   /**
@@ -109,7 +149,8 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @param  {String} ext  File extension.
    */
   _loadAudio(name, ext) {
-    const file = require(`assets/audio/${name}.${ext}`);
+    const dir = 'audio/';
+    const file = require(`assets/${dir}${name}.${ext}`);
     this.game.load.audio(name, file);
   }
 
@@ -119,8 +160,9 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @param  {String} ext  File extension.
    */
   _loadBitmapFont(name, ext) {
-    const file = require(`assets/fonts/${name}${this.postfix}.${ext}`);
-    const data = require(`assets/fonts/${name}${this.postfix}.xml`);
+    const dir = 'fonts/';
+    const file = require(`assets/${dir}${name}${this.postfix}.${ext}`);
+    const data = require(`assets/${dir}${name}${this.postfix}.xml`);
     this.game.load.bitmapFont(name, file, data);
   }
 }

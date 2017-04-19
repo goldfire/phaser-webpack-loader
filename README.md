@@ -14,6 +14,7 @@ View sample usage in this [Phaser ES6 Boilerplate](https://github.com/goldfire/p
 * Integrated with Webpack for automatic cache-busting.
 * Supports all filetypes.
 * Supports asset postfix for retina support ('@2x', '@3x', etc).
+* Supports automatic loading of compressed textures (PVRTC, S3TC, ETC1).
 
 ## Install
 
@@ -97,6 +98,16 @@ The font loader uses [Web Font Loader](https://github.com/typekit/webfontloader)
 ## Loading Sprites/Atlases
 
 All sprite/atlas files are loaded as JSON hashes (which can be output using [TexturePacker](https://www.codeandweb.com/texturepacker), [Shoebox](http://renderhjs.net/shoebox/) and others). All you have to specify in the manifest is the image filename, but you'll also need to include the JSON hash file alongside it, which will automatically get loaded and used.
+
+## Loading Compressed Textures (Phaser-CE 2.7.7+)
+
+[Compressed textures](https://phaser.io/tutorials/advanced-rendering-tutorial/part6) can be great to lower memory usage, especially on mobile devices; however, it isn't necessarily straight-forward how to load these (especially for atlas files). This loader makes it as simple as putting the files in your directory, so long as they match the naming conventions:
+
+#### PVRTC `texture.pvrtc.pvr` & `texture.pvrtc.json`
+#### S3TC `texture.s3tc.pvr` & `texture.s3tc.json`
+#### ETC1 `texture.etc1.pkm` & `texture.etc1.json`
+
+Simply include any or all of these files alongside the `PNG` equivalent and if one of them is compatible with the current browser/hardware it will be loaded and used (falling back to the `PNG` file).
 
 ## Directory Structure
 
