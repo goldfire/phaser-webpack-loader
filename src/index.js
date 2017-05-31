@@ -75,6 +75,10 @@ export default class WebpackLoader extends Phaser.Plugin {
    * @return {Promise} Returns when fonts are ready to use.
    */
   _loadFonts() {
+    if (Object.keys(this.fonts).length === 0) {
+      return Promise.resolve();
+    }
+    
     return new Promise((resolve) => {
       WebFont.load(Object.assign({}, this.fonts, {
         active: resolve,
