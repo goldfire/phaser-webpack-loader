@@ -78,7 +78,7 @@ export default class WebpackLoader extends Phaser.Plugin {
     if (Object.keys(this.fonts).length === 0) {
       return Promise.resolve();
     }
-    
+
     return new Promise((resolve) => {
       WebFont.load(Object.assign({}, this.fonts, {
         active: resolve,
@@ -96,12 +96,15 @@ export default class WebpackLoader extends Phaser.Plugin {
       const dir = 'sprites/';
       const name = asset.split('.')[0];
       const image = this.game.cache.getItem(name, Phaser.Cache.IMAGE);
-      const compression = image.data.compressionAlgorithm;
-      const format = compression ? `.${compression.toLowerCase()}` : '';
-      const data = require(`assets/${dir}${name}${this.postfix}${format}.json`);
 
-      // Add the sprite atlas to the cache.
-      this.game.cache.addTextureAtlas(name, null, image.data, data, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
+      if (image) {
+        const compression = image.data.compressionAlgorithm;
+        const format = compression ? `.${compression.toLowerCase()}` : '';
+        const data = require(`assets/${dir}${name}${this.postfix}${format}.json`);
+
+        // Add the sprite atlas to the cache.
+        this.game.cache.addTextureAtlas(name, null, image.data, data, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
+      }
     });
   }
 
