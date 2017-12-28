@@ -7,10 +7,14 @@ import WebFont from 'webfontloader';
 export default class WebpackLoader extends Phaser.Plugin {
   /**
    * Initialize the load plugin.
-   * @param  {Object} manifest Your asset manifest file contents.
-   * @param  {String} postfix  (optional) Postfix to append to assets.
+   * @param  {Object} manifest          Your asset manifest file contents.
+   * @param  {String} postfix           (optional) Postfix to append to assets.
+   * @param  {Function} assetLoadCallback Callback to fire when each file has loaded.
    */
-  init(manifest, postfix = '') {
+  init(manifest, postfix = '', assetLoadCallback) {
+    // Define the asset load callback.
+    this._assetLoadCallback = assetLoadCallback || (() => {});
+
     // Pull the font values out of the manifest.
     this.fonts = manifest.fonts || {};
 
@@ -60,8 +64,12 @@ export default class WebpackLoader extends Phaser.Plugin {
         });
       });
 
+      // Setup listener for each asset loading.
+      this.game.load.onFileComplete.add(this._assetLoadCallback);
+
       // Once everything has loaded, resolve the promise.
       this.game.load.onLoadComplete.addOnce(() => {
+        this.game.load.onFileComplete.remove(this._assetLoadCallback);
         resolve();
       });
 
@@ -81,7 +89,10 @@ export default class WebpackLoader extends Phaser.Plugin {
 
     return new Promise((resolve) => {
       WebFont.load(Object.assign({}, this.fonts, {
-        active: resolve,
+        active: () => {
+          this._assetLoadCallback();
+          resolve();
+        },
       }));
     });
   }

@@ -15,6 +15,7 @@ View sample usage in this [Phaser ES6 Boilerplate](https://github.com/goldfire/p
 * Supports all filetypes.
 * Supports asset postfix for retina support ('@2x', '@3x', etc).
 * Supports automatic loading of compressed textures (PVRTC, S3TC, ETC1).
+* Optional callback to track each file load (including fonts).
 
 ## Install
 
@@ -91,6 +92,18 @@ this.game.plugins.add(WebpackLoader, AssetManifest, '@2x')
   });
 ```
 
+If you want to know when each file is loaded, use the optional callback:
+
+```javascript
+this.game.plugins.add(WebpackLoader, AssetManifest, '@2x', () => {
+  console.log('File loaded!');
+})
+  .load()
+  .then(() => {
+    this.game.state.start('Main');
+  });
+```
+
 ## Loading Fonts
 
 The font loader uses [Web Font Loader](https://github.com/typekit/webfontloader), which supports loading web fonts from all major providers. Simply provide their standard configuration object in your manifest.
@@ -150,6 +163,6 @@ module: {
 
 ### License
 
-Copyright (c) 2017 [James Simpson](https://twitter.com/GoldFireStudios) and [GoldFire Studios, Inc.](http://goldfirestudios.com)
+Copyright (c) 2018 [James Simpson](https://twitter.com/GoldFireStudios) and [GoldFire Studios, Inc.](http://goldfirestudios.com)
 
 Released under the [MIT License](https://github.com/goldfire/phaser-webpack-loader/blob/master/LICENSE.md).
