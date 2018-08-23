@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://s3.amazonaws.com/howler.js/phaser-webpack-loader.png" alt="Phaser Webpack Loader">
+  <img src="https://s3.amazonaws.com/howler.js/phaser-webpack-loader2.png" alt="Phaser Webpack Loader">
 </p>
 
-# Phaser Webpack Loader
-Instead of manually calling `game.load.image`, `game.load.audio`, etc for every asset in your game (and then dealing with caching issues), phaser-webpack-loader lets you define all assets in a simple manifest file and handles the rest for you.
+# Phaser 3 Webpack Loader
+Instead of manually calling `scene.load.image`, `scene.load.audio`, etc for every asset in your game (and then dealing with caching issues), phaser-webpack-loader lets you define all assets in a simple manifest file and handles the rest for you.
 
-View sample usage in this [Phaser ES6 Boilerplate](https://github.com/goldfire/phaser-boilerplate).
+**NOTE:** This plugin now only supports Phaser 3 and later. If you need support for Phaser 2, [use v1.1.0](https://github.com/goldfire/phaser-webpack-loader/tree/d3c9683e6a5ba9541ec0b0cd11c89fb824ff45b6).
 
 ## Features
 
@@ -14,8 +14,7 @@ View sample usage in this [Phaser ES6 Boilerplate](https://github.com/goldfire/p
 * Integrated with Webpack for automatic cache-busting.
 * Supports all filetypes.
 * Supports asset postfix for retina support ('@2x', '@3x', etc).
-* Supports automatic loading of compressed textures (PVRTC, S3TC, ETC1).
-* Optional callback to track each file load (including fonts).
+* Custom event to track each file load (including fonts).
 
 ## Install
 
@@ -71,13 +70,16 @@ In your preload state, add the plugin. It uses promises, which makes it flexible
 import WebpackLoader from 'phaser-webpack-loader';
 import AssetManifest from '../AssetManifest';
 
-export default class Preload extends Phaser.State {
+export default class Preload extends Phaser.Scene {
+  preload() {
+    this.load.scenePlugin('WebpackLoader', WebpackLoader, 'loader', 'loader');
+  }
+
   create() {
-    this.game.plugins.add(WebpackLoader, AssetManifest)
-      .load()
-      .then(() => {
-        this.game.state.start('Main');
-      });
+    this.loader.start(AssetManifest);
+    this.loader.load().then(() => {
+      // Done loading!
+    });
   }
 }
 ```
@@ -85,23 +87,15 @@ export default class Preload extends Phaser.State {
 If you want to load high DPI assets, you can pass an optional postfix string:
 
 ```javascript
-this.game.plugins.add(WebpackLoader, AssetManifest, '@2x')
-  .load()
-  .then(() => {
-    this.game.state.start('Main');
-  });
+this.loader.start(AssetManifest, '@2x');
 ```
 
 If you want to know when each file is loaded, use the optional callback:
 
 ```javascript
-this.game.plugins.add(WebpackLoader, AssetManifest, '@2x', () => {
-  console.log('File loaded!');
-})
-  .load()
-  .then(() => {
-    this.game.state.start('Main');
-  });
+this.loader.systems.events.on('load', (file) => {
+  console.log('File loaded!', file);
+});
 ```
 
 ## Loading Fonts
@@ -111,16 +105,6 @@ The font loader uses [Web Font Loader](https://github.com/typekit/webfontloader)
 ## Loading Sprites/Atlases
 
 All sprite/atlas files are loaded as JSON hashes (which can be output using [TexturePacker](https://www.codeandweb.com/texturepacker), [Shoebox](http://renderhjs.net/shoebox/) and others). All you have to specify in the manifest is the image filename, but you'll also need to include the JSON hash file alongside it, which will automatically get loaded and used.
-
-## Loading Compressed Textures (Phaser-CE 2.7.7+)
-
-[Compressed textures](https://phaser.io/tutorials/advanced-rendering-tutorial/part6) can be great to lower memory usage, especially on mobile devices; however, it isn't necessarily straight-forward how to load these (especially for atlas files). This loader makes it as simple as putting the files in your directory, so long as they match the naming conventions:
-
-#### PVRTC `texture.pvrtc.pvr` & `texture.pvrtc.json`
-#### S3TC `texture.s3tc.pvr` & `texture.s3tc.json`
-#### ETC1 `texture.etc1.pkm` & `texture.etc1.json`
-
-Simply include any or all of these files alongside the `PNG` equivalent and if one of them is compatible with the current browser/hardware it will be loaded and used (falling back to the `PNG` file).
 
 ## Directory Structure
 

@@ -1,20 +1,24 @@
-import Phaser from 'phaser';
 import WebFont from 'webfontloader';
 
 /**
  * Phaser Webpack Loader plugin for Phaser.
  */
-export default class WebpackLoader extends Phaser.Plugin {
+export default class WebpackLoader extends Phaser.Plugins.ScenePlugin {
   /**
-   * Initialize the load plugin.
+   * Setup the plugin.
+   * @param  {Object} scene         Reference to scene owner.
+   * @param  {Object} pluginManager Scene's plugin manager.
+   */
+  constructor(scene, pluginManager) {
+    super(scene, pluginManager);
+  }
+
+  /**
+   * Start the loader plugin.
    * @param  {Object} manifest          Your asset manifest file contents.
    * @param  {String} postfix           (optional) Postfix to append to assets.
-   * @param  {Function} assetLoadCallback Callback to fire when each file has loaded.
    */
-  init(manifest, postfix = '', assetLoadCallback) {
-    // Define the asset load callback.
-    this._assetLoadCallback = assetLoadCallback || (() => {});
-
+  start(manifest, postfix = '') {
     // Pull the font values out of the manifest.
     this.fonts = manifest.fonts || {};
 
@@ -46,7 +50,15 @@ export default class WebpackLoader extends Phaser.Plugin {
     return Promise.all([
       this._loadAssets(),
       this._loadFonts(),
-    ]).then(this._addSprites.bind(this));
+    ]);
+  }
+
+  /**
+   * Emit load event for each file that loads.
+   * @param  {Object} file Reference to file that has loaded.
+   */
+  _emitLoad(file) {
+    this.systems.events.emit('load', file);
   }
 
   /**
@@ -64,17 +76,17 @@ export default class WebpackLoader extends Phaser.Plugin {
         });
       });
 
-      // Setup listener for each asset loading.
-      this.game.load.onFileComplete.add(this._assetLoadCallback);
+      // Emit load event on each file.
+      this.scene.load.on('load', this._emitLoad, this);
 
       // Once everything has loaded, resolve the promise.
-      this.game.load.onLoadComplete.addOnce(() => {
-        this.game.load.onFileComplete.remove(this._assetLoadCallback);
+      this.scene.load.once('complete', () => {
+        this.scene.load.off('load', this._emitLoad);
         resolve();
       });
 
       // Start the loading of the assets.
-      this.game.load.start();
+      this.scene.load.start();
     });
   }
 
@@ -90,32 +102,10 @@ export default class WebpackLoader extends Phaser.Plugin {
     return new Promise((resolve) => {
       WebFont.load(Object.assign({}, this.fonts, {
         active: () => {
-          this._assetLoadCallback();
+          this.systems.events.emit('load');
           resolve();
         },
       }));
-    });
-  }
-
-  /**
-   * Create the texture atlases once the image data has loaded.
-   * This is required in order to load compressed textures as an atlas.
-   */
-  _addSprites() {
-    this.assets.sprites.forEach((asset) => {
-      // Get the image/data for the sprite atlas.
-      const dir = 'sprites/';
-      const name = asset.split('.')[0];
-      const image = this.game.cache.getItem(name, Phaser.Cache.IMAGE);
-
-      if (image) {
-        const compression = image.data.compressionAlgorithm;
-        const format = compression ? `.${compression.toLowerCase()}` : '';
-        const data = require(`assets/${dir}${name}${this.postfix}${format}.json`);
-
-        // Add the sprite atlas to the cache.
-        this.game.cache.addTextureAtlas(name, null, image.data, data, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
-      }
     });
   }
 
@@ -127,7 +117,7 @@ export default class WebpackLoader extends Phaser.Plugin {
   _loadImage(name, ext) {
     const dir = 'images/';
     const file = require(`assets/${dir}${name}${this.postfix}.${ext}`);
-    this.game.load.image(name, file);
+    this.scene.load.image(name, file);
   }
 
   /**
@@ -137,28 +127,9 @@ export default class WebpackLoader extends Phaser.Plugin {
    */
   _loadSprite(name, ext) {
     const dir = 'sprites/';
-
-    // Determine which formats are available.
-    const formats = {};
-
-    try {
-      formats.truecolor = require(`assets/${dir}${name}${this.postfix}.${ext}`);
-    } catch (e) {}
-
-    try {
-      formats.pvrtc = require(`assets/${dir}${name}${this.postfix}.pvrtc.pvr`);
-    } catch (e) {}
-
-    try {
-      formats.s3tc = require(`assets/${dir}${name}${this.postfix}.s3tc.pvr`);
-    } catch (e) {}
-
-    try {
-      formats.etc1 = require(`assets/${dir}${name}${this.postfix}.etc1.pkm`);
-    } catch (e) {}
-
-    // Load the format that works on this platform.
-    this.game.load.image(name, formats);
+    const file = require(`assets/${dir}${name}${this.postfix}.${ext}`);
+    const data = require(`assets/${dir}${name}${this.postfix}.json`);
+    this.scene.load.atlas(name, file, data);
   }
 
   /**
@@ -169,7 +140,7 @@ export default class WebpackLoader extends Phaser.Plugin {
   _loadAudio(name, ext) {
     const dir = 'audio/';
     const file = require(`assets/${dir}${name}.${ext}`);
-    this.game.load.audio(name, file);
+    this.scene.load.audio(name, file);
   }
 
   /**
@@ -181,6 +152,6 @@ export default class WebpackLoader extends Phaser.Plugin {
     const dir = 'fonts/';
     const file = require(`assets/${dir}${name}${this.postfix}.${ext}`);
     const data = require(`assets/${dir}${name}${this.postfix}.xml`);
-    this.game.load.bitmapFont(name, file, data);
+    this.scene.load.bitmapFont(name, file, data);
   }
 }
