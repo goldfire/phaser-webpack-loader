@@ -28,6 +28,7 @@ export default class WebpackLoader extends Phaser.Plugins.ScenePlugin {
       sprites: manifest.sprites || [],
       audio: manifest.audio || [],
       bitmapFonts: manifest.bitmapFonts || [],
+      spriteSheets: manifest.spriteSheets || []
     };
 
     // Define the loaders for the different asset types.
@@ -36,6 +37,7 @@ export default class WebpackLoader extends Phaser.Plugins.ScenePlugin {
       sprites: this._loadSprite,
       audio: this._loadAudio,
       bitmapFonts: this._loadBitmapFont,
+      spriteSheets: this._loadSpriteSheet
     };
 
     // Define the postfix string to apply to image assets (ex: @2x).
@@ -153,5 +155,17 @@ export default class WebpackLoader extends Phaser.Plugins.ScenePlugin {
     const file = require(`assets/${dir}${name}${this.postfix}.${ext}`);
     const data = require(`assets/${dir}${name}${this.postfix}.xml`);
     this.scene.load.bitmapFont(name, file, data);
+  }
+
+  /**
+   * Load a sprite sheet.
+   * @param  {String} name Name of the file.
+   * @param  {String} ext File extension.
+   */
+  _loadSpriteSheet(name, ext) {
+    const dir = 'spriteSheets/';
+    const file = require(`assets/${dir}${name}${this.postfix}.${ext}`);
+    const data = require(`assets/${dir}${name}${this.postfix}.json`);
+    this.scene.load.spritesheet(name, file, data);
   }
 }
