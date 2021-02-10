@@ -62,6 +62,14 @@ export default class WebpackLoader extends Phaser.Plugins.ScenePlugin {
   }
 
   /**
+   * Emit progress event for each file that loads.
+   * @param  {Object} progress Progress from 0 to 1.
+   */
+  _emitProgress(progress) {
+    this.systems.events.emit('progress', progress);
+  }
+
+  /**
    * Load all assets in parallel.
    * @return {Promise} Returns when assets are loaded.
    */
@@ -79,9 +87,13 @@ export default class WebpackLoader extends Phaser.Plugins.ScenePlugin {
       // Emit load event on each file.
       this.scene.load.on('load', this._emitLoad, this);
 
+      // Emit progress event on each file.
+      this.scene.load.on('progress', this._emitProgress, this);
+
       // Once everything has loaded, resolve the promise.
       this.scene.load.once('complete', () => {
         this.scene.load.off('load', this._emitLoad);
+        this.scene.load.off('progress', this._emitProgress);
         resolve();
       });
 
